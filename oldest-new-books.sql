@@ -25,19 +25,19 @@ from
 		ins.id as instance_uuid,
 		item.id as item_uuid,
 		holding.id as holding_uuid,
-		to_char(to_timestamp(pltc.receipt_date, 'YYYY-MM-DD"T"HH24:MI:SS"+0000"') - interval '5 hours', 'YYYY-MM-DD"T"HH24:MI:SS') as item_received_date
+		to_char(to_timestamp(plt.receipt_date, 'YYYY-MM-DD"T"HH24:MI:SS"+0000"') - interval '5 hours', 'YYYY-MM-DD"T"HH24:MI:SS') as item_received_date
 	from 
 		inventory.instance__t ins 
 		inner join inventory.holdings_record__t holding on ins.id = holding.instance_id 
 		inner join inventory.item__t item on holding.id = item.holdings_record_id 
 		inner join inventory.location__t loc on loc.id = item.effective_location_id
 		inner join inventory.location__t loc2 on loc2.id = holding.permanent_location_id
-		left join orders.po_line__t__claims pltc on item.purchase_order_line_identifier = pltc.id
-		left join inventory.item__t__circulation_notes itcn on item.id = itcn.id
+		inner join orders.po_line__t plt on item.purchase_order_line_identifier = plt.id
+		inner join inventory.item__t__circulation_notes itcn on item.id = itcn.id
 	where
 		loc.name = 'MH New Books'
 	order by
-		to_char(to_timestamp(pltc.receipt_date, 'YYYY-MM-DD"T"HH24:MI:SS"+0000"') - interval '5 hours', 'YYYY-MM-DD"T"HH24:MI:SS') --order by receipt date
+		to_char(to_timestamp(plt.receipt_date, 'YYYY-MM-DD"T"HH24:MI:SS"+0000"') - interval '5 hours', 'YYYY-MM-DD"T"HH24:MI:SS') --order by receipt date
 	limit 
 		(select 
 			number_of_results 
